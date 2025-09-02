@@ -1,38 +1,43 @@
 #######################################################################################################
-# This script plots the individual figuers present in Fig_3
+# This script generates the plots used for Fig. 3 of the manuscript.
+# Fig. 3a: Daily infection rate under different initial exposure levels (E10)
+# Fig. 3b: Daily hospitalization rate under the same scenarios
 #######################################################################################################
 
-rm(list = ls())
-here::here()
-source(here("scripts", "base_packages.R"))
-source(here("scripts", "mod_SEIR.R"))
+# --- Setup ---
+rm(list = ls())                       # Clear the workspace
+here::here()                          # Ensure project root is set with {here}
+source(here("scripts", "base_packages.R"))  # Load required packages
+source(here("scripts", "mod_SEIR.R"))       # Load SEIR model definition
 
-# Values of E10 to test
-E10_values <- c(1e4, 1e-4, 1e-6)
+# --- Define scenarios ---
+E10_values <- c(1e4, 1e-4, 1e-6)                     # Values of E10 to test
+scenario_labels <- c("minimal", "partial", "complete")  # Human-readable labels
+plots_list <- list()                                  # Store infection plots
+plots_hosp <- list()                                  # Store hospitalization plots
 
-# Labels you want
-scenario_labels <- c("minimal", "partial", "complete")
-
-plots_list <- list()
+#######################################################################################################
+# Fig. 3a: Infection dynamics (I1 and I2) across scenarios
+#######################################################################################################
 for (i in seq_along(E10_values)) {
   
-  val <- E10_values[i]
+  val   <- E10_values[i]
   label <- scenario_labels[i]
   
-  # Update parameter
+  # --- Update model parameter ---
   params_case1["E10"] <- val
   
-  # Simulate trajectory
+  # --- Simulate model trajectory ---
   tj_sim <- trajectory(object = SIR_matrix_mod, params = params_case1, format = "data.frame") %>%
     select(-c(".id")) %>%
     select(time, everything()) %>%
     mutate(across(where(is.numeric), ~ round(., 2)))
   
-  # Prepare data
+  # --- Compute total infections for each virus ---
   combined_df <- tj_sim %>%
     mutate(
-      I_1 = X_IS + X_IE + X_II + X_IR,
-      I_2 = X_SI + X_EI + X_II + X_RI
+      I_1 = X_IS + X_IE + X_II + X_IR,  # Virus 1 infections
+      I_2 = X_SI + X_EI + X_II + X_RI   # Virus 2 infections
     ) %>%
     pivot_longer(
       cols = -time,
@@ -41,7 +46,7 @@ for (i in seq_along(E10_values)) {
     ) %>%
     filter(variable %in% c("I_1", "I_2"))
   
-  # Plot
+  # --- Build infection plot ---
   p <- ggplot(combined_df, aes(x = time, y = value / pop, color = variable, size = variable)) +
     geom_line() +
     scale_color_manual(
@@ -58,9 +63,8 @@ for (i in seq_along(E10_values)) {
     ) +
     scale_x_continuous(limits = c(1, 350)) +
     labs(
-      #title = paste("Scenario:", label),
       x = "Time (days)",
-      y = "daily infection rate",
+      y = "Daily infection rate",
       color = "State",
       size = "State"
     ) +
@@ -80,17 +84,20 @@ for (i in seq_along(E10_values)) {
   
   plots_list[[label]] <- p
   
-  # Save each plot separately
+  # --- Save to PDF ---
   pdf(sprintf("figure_3a_%s.pdf", label), width = 5, height = 4)
   print(p)
   dev.off()
 }
 
-# Example: show one plot in R
+# Example: Display one scenario
 print(plots_list[["partial"]])
 
+#######################################################################################################
+# Fig. 3b: Hospitalization dynamics (H1, H2, H1o, H2o) across scenarios
+#######################################################################################################
 
-##### plot hospitalization Fig_3_b
+# Define plotting aesthetics
 color_map <- c("X_H1" = "dodgerblue", "X_H1o" = "navyblue",
                "X_H2" = "coral",      "X_H2o" = "red")
 linetype_map <- c("X_H1" = "solid", "X_H1o" = "dashed",
@@ -100,35 +107,34 @@ label_map <- c("X_H1"  = expression(H[1]),
                "X_H2"  = expression(H[2]),
                "X_H2o" = expression(H[2]^(o)))
 
-plots_hosp <- list()
-
 for (i in seq_along(E10_values)) {
   
   val   <- E10_values[i]
   label <- scenario_labels[i]
   
-  # --- set parameter and simulate ---
+  # --- Update model parameter ---
   params_case1["E10"] <- val
   
+  # --- Simulate model trajectory ---
   tj_sim <- trajectory(object = SIR_matrix_mod,
                        params = params_case1,
                        format = "data.frame") %>%
     select(-.id) %>%
     select(time, everything())
   
-  # --- reshape for plotting ---
+  # --- Reshape hospitalization data ---
   combined_df_long <- tj_sim %>%
     pivot_longer(cols = c(X_H1, X_H2, X_H1o, X_H2o),
                  names_to = "variable", values_to = "value")
   
-  # --- build plot ---
+  # --- Build hospitalization plot ---
   p_hosp <- ggplot() +
-    # Solid lines (thinner)
+    # Solid lines = true hospitalizations
     geom_line(data = combined_df_long %>% filter(variable %in% c("X_H1","X_H2")),
               aes(x = time, y = (value * 1e5) / pop,
                   color = variable, linetype = variable),
               size = 1.2) +
-    # Dashed lines (thicker)
+    # Dashed lines = observed hospitalizations (with hitchhiker bias)
     geom_line(data = combined_df_long %>% filter(variable %in% c("X_H1o","X_H2o")),
               aes(x = time, y = (value * 1e5) / pop,
                   color = variable, linetype = variable),
@@ -139,9 +145,8 @@ for (i in seq_along(E10_values)) {
                   labels = trans_format("log10", math_format(10^.x))) +
     scale_x_continuous(limits = c(1, 350)) +
     labs(
-      #title = paste("Scenario:", label),
       x = "Time (days)",
-      y = "daily hospitalization rate × 10^5"
+      y = "Daily hospitalization rate × 10^5"
     ) +
     theme_minimal() +
     theme(
@@ -159,14 +164,11 @@ for (i in seq_along(E10_values)) {
   
   plots_hosp[[label]] <- p_hosp
   
-  # --- save each as PDF ---
+  # --- Save to PDF ---
   pdf(sprintf("figure_3b_%s.pdf", label), width = 5, height = 4)
   print(p_hosp)
   dev.off()
 }
 
-# Example: show one plot
-#print(plots_hosp[["minimal"]])
-
-
-
+# Example: Display one scenario
+# print(plots_hosp[["minimal"]])

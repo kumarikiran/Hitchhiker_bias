@@ -23,7 +23,16 @@ This folder contains R scripts for building and simulating a **two-virus SEIR mo
   - For each combination, generates **100 noisy replicates** using a negative binomial observation model (`rho_mean = 1`, `rho_k = 0.04`).  
   - Saves combined outputs as `.rds` files in the `output_data_noise_4percent/` folder (created if missing).  
   - Useful for sensitivity analyses of noisy hospitalization data.
-
+- `scripts/fit_set_prior_MCMC.R` – defines Bayesian prior distributions for model parameters (for use with **BayesianTools**):  
+  - Parameters supported: `Ri1p`, `rho1`, `Ri2p`, `rho2`, `thetap`, `psi`.  
+  - Priors:  
+    - `Ri1p`, `Ri2p` ~ Exponential(rate = 0.1)  
+    - `rho1`, `rho2`, `thetap` ~ Beta(2, 2)  
+    - `psi` ~ Uniform(0, 1)  
+  - Returns a prior object with:  
+    - **density function** (log-scale) for evaluating priors,  
+    - **sampling function** for drawing random samples,  
+    - **parameter bounds** (lower/upper). 
 
 ## Usage
 1. Load packages:

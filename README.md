@@ -33,10 +33,16 @@ This folder contains R scripts for building and simulating a **two-virus SEIR mo
     - **density function** (log-scale) for evaluating priors,  
     - **sampling function** for drawing random samples,  
     - **parameter bounds** (lower/upper). 
+- `scripts/fit_run_MCMC.R` – fits the SEIR POMP model to simulated noisy hospitalization data using **Bayesian MCMC**:  
+  - Loops over 100 replicated noisy datasets (from `run_simulations.R`).  
+  - Builds a `pomp` object with observed `cases_v1` and `cases_v2`.  
+  - Estimates six parameters: `Ri1p`, `rho1`, `Ri2p`, `rho2`, `thetap`, `psi`.  
+  - Likelihood function created via `traj_objfun` (trajectory matching).  
+  - Priors specified with `set_prior.R`.  
+  - Runs **Differential Evolution MCMC with snooker update (DEzs)** via `BayesianTools`.  
+  - Saves chain objects in `MCMC_fit/` and posterior samples in `MCMC_results/`.  
+  - Provides diagnostic outputs (DIC, MAP, MCMC summary) for model assessment.
 
-## Usage
-1. Load packages:
-   ```r
-   source(here::here("src", "scripts", "base_packages.R"))
+
 
 

@@ -17,7 +17,7 @@ This folder contains R scripts for building and simulating a **two-virus SEIR mo
   - **Fig. 4a**: Change in peak hospitalization amplitude vs. `corr(I₁, I₂)`.  
   - **Fig. 4b**: Change in peak hospitalization timing vs. `corr(I₁, I₂)`.  
   - **Fig. 4c–d**: Heatmaps of these changes over `corr(I₁, I₂)` × pathogen pathogenicity (`rho2`).
-- `scripts/run_simulations.R` – runs SEIR simulations with noise injection for hospitalizations:  
+- `scripts/simulations_with_noise.R` – runs SEIR simulations with noise injection for hospitalizations:  
   - Sweeps over three values of initial exposure (`E10`: 1e4, 1e-4, 1e-6).  
   - Sweeps over four reporting probabilities of virus 2 (`rho2`: 0.01, 0.10, 0.25, 0.50).  
   - For each combination, generates **100 noisy replicates** using a negative binomial observation model (`rho_mean = 1`, `rho_k = 0.04`).  

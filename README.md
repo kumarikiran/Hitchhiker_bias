@@ -42,7 +42,12 @@ This folder contains R scripts for building and simulating a **two-virus SEIR mo
   - Runs **Differential Evolution MCMC with snooker update (DEzs)** via `BayesianTools`.  
   - Saves chain objects in `MCMC_fit/` and posterior samples in `MCMC_results/`.  
   - Provides diagnostic outputs (DIC, MAP, MCMC summary) for model assessment.
-
+- `scripts/make_fig_MCMC_fit.R` – aggregates posterior parameter means across replicates and produces **ridge density plots**:  
+  - Loads MCMC results (`mcmc_results/*.rds`) for both hitchhiker-on (`Hon`) and hitchhiker-off (`Hoff`) scenarios.  
+  - Extracts and averages parameter estimates (currently focusing on `Ri1p`).  
+  - Scales `Ri1p` values for interpretability and groups them by scenario and setting (`minimal`, `partial`, `complete`).  
+  - Creates ridge plots (`ggridges`) comparing posterior distributions across scenarios.  
+  - Saves the figure as a PDF (`aa_plot.pdf`).
 
 
 

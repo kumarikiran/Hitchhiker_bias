@@ -5,8 +5,8 @@
 
 # --- Setup ---
 rm(list = ls())                       # Clear the R workspace
+library(here)
 here::here()                          # Set project root path (using {here})
-source(here("scripts", "base_packages.R"))  # Load required packages
 source(here("scripts", "mod_SEIR.R"))       # Load SEIR model definition
 
 # --- Define parameter grids ---

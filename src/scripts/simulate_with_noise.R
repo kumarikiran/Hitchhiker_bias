@@ -8,8 +8,8 @@
 
 # --- Setup ---
 rm(list = ls())                       # Clear the R workspace
+library(here)
 here::here()                          # Set project root path (using {here})
-source(here("scripts", "base_packages.R"))  # Load required packages
 source(here("scripts", "mod_SEIR.R"))       # Load SEIR model definition
 
 # --- Experiment grid --------------------------------------------------------------------------------------------------
@@ -21,8 +21,6 @@ rho_points <- c(0.01, 0.10, 0.25, 0.50)
 
 # Fixed parameter toggles
 params_case1["hitchhikers"] <- 1                 
-
-data_points <- c(10000, 0.0001, 0.000001)
 
 # --- Output configuration ---------------------------------------------------------------------------------------------
 out_dir <- here::here("output_data_noise_4percent")

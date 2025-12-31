@@ -114,6 +114,8 @@ init_SIR_matrix <- "
   X_H1 = 0;
   X_H2 = 0;
   X_Ht = 0;
+  X_H1o = 0;
+  X_H2o = 0;
 "
 
 # ---------------------------- Measurement model (Negative Binomial) ----------------------------
@@ -238,24 +240,8 @@ SIR_matrix_mod <- pomp(
 
 # ---------------------------- Convenience parameter set for simulations ----------------------------
 # params_case1 can be passed to trajectory() or simulate() to generate trajectories
-params_case1 = c(Ri1p = 2.5/10,
-                 Ri2p = 2.5/10, 
-                 b_amp1 = 0.0, 
-                 b_amp2 = 0.0, 
-                 b_pha1 = 0.0,
-                 b_pha2 = 0.0,
-                 sigma1 = 1 / 4, 
-                 sigma2 = 1 / 4, 
-                 gamma1 = 1 / 5, 
-                 gamma2 = 1 / 5, 
-                 thetap = 1/10, 
-                 alpha = 0.0, 
-                 N = pop,
-                 E10 = 1e-6, 
-                 E20 = 1e-6, 
-                 R10 = 0, 
-                 R20 = 0,
-                 rho1 = 1, 
-                 rho2 = 0.01, 
-                 psi = 0.04, 
-                 hitchhikers = 1.0)
+
+coef(SIR_matrix_mod)['E10'] <- 1e-6
+coef(SIR_matrix_mod)['E20'] <- 1e-6
+params_case1 = SIR_matrix_mod@params
+

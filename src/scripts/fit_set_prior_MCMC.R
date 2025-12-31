@@ -1,8 +1,3 @@
-# Load required libraries
-library(BayesianTools)  # For creating prior distributions compatible with Bayesian MCMC/SMC samplers
-library(tibble)         # For creating and manipulating tidy tabular data (tribble)
-library(dplyr)          # For data manipulation (filter, mutate, arrange, etc.)
-
 # --------------------------------------------------------------------------------------------------
 # Function: set_prior
 # Purpose:  Define prior distributions for a set of model parameters and return a BayesianTools

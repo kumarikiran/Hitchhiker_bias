@@ -32,7 +32,7 @@ for (group in c("Hon", "Hoff")) {
           group = group,
           setting = i,
           replica = replica,
-          Ri1p = param_means["Ri1p"] ## change
+          Ri1p = param_means["Ri1p"] # Parameter to be plotted.
         )
       } else {
         warning(sprintf("File not found: %s", file))
@@ -63,7 +63,7 @@ plot_1<-ggplot(param_df, aes(x = Ri1p, y = group_setting_clean, fill = group)) +
     alpha = 0.1,           # semi-transparent fill
     point_alpha = 0.6,     # semi-transparent points
     jittered_points = TRUE,
-    size = 1             # border line thickness
+    linewidth = 1             # border line thickness
   ) +
   geom_vline(xintercept = 2.5, color = "black", linetype = "dashed", size = 1.0) +   # <- vertical line
   scale_color_hue(l = 40) +

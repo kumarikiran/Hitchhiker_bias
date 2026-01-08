@@ -140,9 +140,7 @@ for (replica in 1:100) {
   # ---------------------- MCMC settings ----------------------
   n_chains <- 5           # number of concurrent chains for DEzs
   n_iter   <- 2e4         # iterations per chain (burn-in handled when extracting samples)
-  
-  # Starting values for each chain (replicate my_init)
-  start_chains <- replicate(n = n_chains, expr = my_init) %>% t()
+
   
   # Custom parameter ranges to generate proposal archive Z for DEzs (Differential Evolution sampler)
   ranges_custom <- matrix(c(
@@ -150,11 +148,23 @@ for (replica in 1:100) {
     0.001, 1,     # rho1
     0.1,   1,     # Ri2p
     0.001, 1,     # rho2
-    0.001, 0.05,  # thetap
+    0.01, 0.5,  # thetap
     1e-12, 1      # psi
   ), ncol = 2, byrow = TRUE)
   colnames(ranges_custom) <- c("min", "max")
   rownames(ranges_custom) <- pars_est_nm
+  
+  # Starting values for each chain (replicate my_init)
+  #start_chains <- replicate(n = n_chains, expr = my_init) %>% t()
+  ### random ±25% perturbation from the start value + clamp to valid ranges
+  start_chains <- t(replicate(n_chains, {
+    perturbed <- my_init * (1 + runif(length(my_init), min = -0.25, max = 0.25))
+    
+    # clamp to parameter ranges
+    pmin(pmax(perturbed, ranges_custom[, "min"]), ranges_custom[, "max"])
+  }))
+  
+  colnames(start_chains) <- names(my_init)
   
   # Archive Z: random draws within the specified ranges (500 draws per parameter)
   Z_mat <- matrix(
